@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>部員向け音楽投票システム</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: #333;
+      color: white;
+    }
+
+    .song {
+      padding: 15px;
+      margin-top: 10px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🎵 音楽投票システム</h1>
+
+  <div id="login">
+    <h2>部員ログイン</h2>
+
+    <input
+      type="text"
+      id="memberName"
+      placeholder="部員名"
+    >
+
+    <input
+      type="password"
+      id="memberNumber"
+      placeholder="ログイン番号"
+    >
+
+    <button onclick="login()">ログイン</button>
+
+    <div id="loginMessage" class="message"></div>
+  </div>
+
+
+  <div id="voteArea" class="hidden">
+
+    <h2 id="welcome"></h2>
+
+    <p>
+      投票したい曲を選んでください。
+    </p>
+
+    <div class="song">
+      <label>
+        <input type="checkbox" value="曲A">
+        曲A
+      </label>
+    </div>
+
+    <div class="song">
+      <label>
+        <input type="checkbox" value="曲B">
+        曲B
+      </label>
+    </div>
+
+    <div class="song">
+      <label>
+        <input type="checkbox" value="曲C">
+        曲C
+      </label>
+    </div>
+
+    <button onclick="vote()">投票する</button>
+
+    <div id="voteMessage" class="message"></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+function login() {
+
+  const name =
+    document.getElementById("memberName").value;
+
+  const number =
+    document.getElementById("memberNumber").value;
+
+  if (name === "" || number === "") {
+
+    document.getElementById("loginMessage").textContent =
+      "名前とログイン番号を入力してください。";
+
+    return;
+  }
+
+  document.getElementById("login").classList.add("hidden");
+
+  document.getElementById("voteArea").classList.remove("hidden");
+
+  document.getElementById("welcome").textContent =
+    name + "さん、ようこそ！";
+}
+
+
+function vote() {
+
+  const selected =
+    document.querySelectorAll(
+      'input[type="checkbox"]:checked'
+    );
+
+  if (selected.length === 0) {
+
+    document.getElementById("voteMessage").textContent =
+      "曲を1つ以上選択してください。";
+
+    return;
+  }
+
+  let songs = [];
+
+  selected.forEach(function(song) {
+    songs.push(song.value);
+  });
+
+  document.getElementById("voteMessage").textContent =
+    "「" + songs.join("」「") + "」に投票しました！";
+}
+
+</script>
+
+</body>
+</html>
