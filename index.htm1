@@ -1,124 +1,218 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>部員向け音楽投票システム</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>部員向け投票システム</title>
 
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      padding: 20px;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f3f5f9;
+  color: #222;
+}
 
-    h1 {
-      text-align: center;
-    }
+.container {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 20px;
+}
 
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+  margin-bottom: 20px;
+}
 
-    button {
-      cursor: pointer;
-      border: none;
-      border-radius: 8px;
-      background: #333;
-      color: white;
-    }
+h1 {
+  text-align: center;
+  margin-bottom: 8px;
+}
 
-    .song {
-      padding: 15px;
-      margin-top: 10px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-    }
+h2 {
+  margin-top: 0;
+}
 
-    .hidden {
-      display: none;
-    }
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 25px;
+}
 
-    .message {
-      margin-top: 15px;
-      font-weight: bold;
-    }
-  </style>
+input,
+button,
+select {
+  width: 100%;
+  padding: 13px;
+  margin-top: 10px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+input,
+select {
+  border: 1px solid #ccc;
+}
+
+button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.song {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 12px;
+}
+
+.song label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.song input {
+  width: auto;
+  margin: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.user-info {
+  background: #eef4ff;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.logout {
+  background: #777;
+}
+
+.message {
+  text-align: center;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.result {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.admin {
+  background: #fff7ed;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-  <h1>🎵 音楽投票システム</h1>
+  <!-- ログイン画面 -->
+  <div id="loginScreen" class="card">
 
-  <div id="login">
-    <h2>部員ログイン</h2>
+    <h1>🎵 部員向け投票システム</h1>
+
+    <p class="subtitle">
+      部員番号とパスワードを入力してください
+    </p>
 
     <input
+      id="memberId"
       type="text"
-      id="memberName"
-      placeholder="部員名"
+      placeholder="部員番号"
     >
 
     <input
+      id="password"
       type="password"
-      id="memberNumber"
-      placeholder="ログイン番号"
+      placeholder="パスワード"
     >
 
-    <button onclick="login()">ログイン</button>
+    <button onclick="login()">
+      ログイン
+    </button>
 
     <div id="loginMessage" class="message"></div>
+
   </div>
 
 
-  <div id="voteArea" class="hidden">
+  <!-- 投票画面 -->
+  <div id="voteScreen" class="hidden">
 
-    <h2 id="welcome"></h2>
+    <div class="card">
 
-    <p>
-      投票したい曲を選んでください。
-    </p>
+      <h1>🎵 曲決め投票</h1>
 
-    <div class="song">
-      <label>
-        <input type="checkbox" value="曲A">
-        曲A
-      </label>
+      <div class="user-info">
+        ログイン中：
+        <strong id="memberName"></strong>
+      </div>
+
+      <h2>投票できる曲</h2>
+
+      <div id="songList"></div>
+
+      <button onclick="submitVote()">
+        この曲に投票する
+      </button>
+
+      <div id="voteMessage" class="message"></div>
+
+      <button class="logout" onclick="logout()">
+        ログアウト
+      </button>
+
     </div>
 
-    <div class="song">
-      <label>
-        <input type="checkbox" value="曲B">
-        曲B
-      </label>
+  </div>
+
+
+  <!-- 管理者画面 -->
+  <div id="adminScreen" class="hidden">
+
+    <div class="card admin">
+
+      <h1>⚙️ 管理者画面</h1>
+
+      <p>
+        現在の投票結果
+      </p>
+
+      <div id="results"></div>
+
+      <button onclick="clearVotes()">
+        投票結果をリセット
+      </button>
+
+      <button class="logout" onclick="logout()">
+        ログアウト
+      </button>
+
     </div>
-
-    <div class="song">
-      <label>
-        <input type="checkbox" value="曲C">
-        曲C
-      </label>
-    </div>
-
-    <button onclick="vote()">投票する</button>
-
-    <div id="voteMessage" class="message"></div>
 
   </div>
 
@@ -127,54 +221,345 @@
 
 <script>
 
+/*
+====================================
+部員データ
+====================================
+
+id       → 部員番号
+password → パスワード
+name     → 表示名
+songs    → 投票できる曲
+*/
+
+const members = [
+
+  {
+    id: "001",
+    password: "1111",
+    name: "部員A",
+    songs: [
+      "青と夏",
+      "小さな恋のうた",
+      "怪獣の花唄"
+    ]
+  },
+
+  {
+    id: "002",
+    password: "2222",
+    name: "部員B",
+    songs: [
+      "水平線",
+      "怪獣の花唄",
+      "高嶺の花子さん"
+    ]
+  },
+
+  {
+    id: "003",
+    password: "3333",
+    name: "部員C",
+    songs: [
+      "青と夏",
+      "水平線",
+      "小さな恋のうた"
+    ]
+  }
+
+];
+
+
+/*
+====================================
+全曲リスト
+====================================
+*/
+
+const allSongs = [
+  "青と夏",
+  "小さな恋のうた",
+  "怪獣の花唄",
+  "水平線",
+  "高嶺の花子さん"
+];
+
+
+let currentMember = null;
+
+
+/*
+====================================
+ログイン
+====================================
+*/
+
 function login() {
 
-  const name =
-    document.getElementById("memberName").value;
+  const id =
+    document.getElementById("memberId").value.trim();
 
-  const number =
-    document.getElementById("memberNumber").value;
+  const password =
+    document.getElementById("password").value.trim();
 
-  if (name === "" || number === "") {
 
-    document.getElementById("loginMessage").textContent =
-      "名前とログイン番号を入力してください。";
+  // 管理者ログイン
+  if (id === "admin" && password === "admin123") {
+
+    document
+      .getElementById("loginScreen")
+      .classList.add("hidden");
+
+    document
+      .getElementById("adminScreen")
+      .classList.remove("hidden");
+
+    showResults();
 
     return;
   }
 
-  document.getElementById("login").classList.add("hidden");
 
-  document.getElementById("voteArea").classList.remove("hidden");
+  // 部員検索
+  const member = members.find(
+    m => m.id === id && m.password === password
+  );
 
-  document.getElementById("welcome").textContent =
-    name + "さん、ようこそ！";
+
+  if (!member) {
+
+    document.getElementById("loginMessage").textContent =
+      "部員番号またはパスワードが違います。";
+
+    return;
+  }
+
+
+  currentMember = member;
+
+
+  document
+    .getElementById("loginScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("voteScreen")
+    .classList.remove("hidden");
+
+
+  document.getElementById("memberName").textContent =
+    member.name;
+
+
+  showSongs();
 }
 
 
-function vote() {
+/*
+====================================
+投票できる曲を表示
+====================================
+*/
+
+function showSongs() {
+
+  const list =
+    document.getElementById("songList");
+
+  list.innerHTML = "";
+
+
+  currentMember.songs.forEach(song => {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "song";
+
+    div.innerHTML = `
+      <label>
+        <input
+          type="radio"
+          name="song"
+          value="${song}"
+        >
+        <span>${song}</span>
+      </label>
+    `;
+
+    list.appendChild(div);
+
+  });
+
+}
+
+
+/*
+====================================
+投票
+====================================
+*/
+
+function submitVote() {
 
   const selected =
-    document.querySelectorAll(
-      'input[type="checkbox"]:checked'
+    document.querySelector(
+      'input[name="song"]:checked'
     );
 
-  if (selected.length === 0) {
+
+  if (!selected) {
 
     document.getElementById("voteMessage").textContent =
-      "曲を1つ以上選択してください。";
+      "投票する曲を選んでください。";
 
     return;
   }
 
-  let songs = [];
 
-  selected.forEach(function(song) {
-    songs.push(song.value);
-  });
+  const votes =
+    JSON.parse(
+      localStorage.getItem("votes") || "{}"
+    );
+
+
+  if (!votes[selected.value]) {
+    votes[selected.value] = 0;
+  }
+
+
+  votes[selected.value]++;
+
+
+  localStorage.setItem(
+    "votes",
+    JSON.stringify(votes)
+  );
+
+
+  /*
+  同じ部員の二重投票を防止
+  */
+
+  const votedMembers =
+    JSON.parse(
+      localStorage.getItem("votedMembers") || "[]"
+    );
+
+
+  if (!votedMembers.includes(currentMember.id)) {
+
+    votedMembers.push(currentMember.id);
+
+    localStorage.setItem(
+      "votedMembers",
+      JSON.stringify(votedMembers)
+    );
+
+  }
+
 
   document.getElementById("voteMessage").textContent =
-    "「" + songs.join("」「") + "」に投票しました！";
+    "投票しました！ありがとうございます。";
+
+}
+
+
+/*
+====================================
+管理者：結果表示
+====================================
+*/
+
+function showResults() {
+
+  const results =
+    document.getElementById("results");
+
+
+  const votes =
+    JSON.parse(
+      localStorage.getItem("votes") || "{}"
+    );
+
+
+  results.innerHTML = "";
+
+
+  allSongs.forEach(song => {
+
+    const count =
+      votes[song] || 0;
+
+
+    const div =
+      document.createElement("div");
+
+    div.className = "result";
+
+    div.innerHTML = `
+      <span>${song}</span>
+      <strong>${count}票</strong>
+    `;
+
+    results.appendChild(div);
+
+  });
+
+}
+
+
+/*
+====================================
+投票結果リセット
+====================================
+*/
+
+function clearVotes() {
+
+  if (
+    confirm(
+      "本当に投票結果をリセットしますか？"
+    )
+  ) {
+
+    localStorage.removeItem("votes");
+    localStorage.removeItem("votedMembers");
+
+    showResults();
+
+  }
+
+}
+
+
+/*
+====================================
+ログアウト
+====================================
+*/
+
+function logout() {
+
+  currentMember = null;
+
+
+  document
+    .getElementById("voteScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("adminScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginScreen")
+    .classList.remove("hidden");
+
+
+  document.getElementById("memberId").value = "";
+  document.getElementById("password").value = "";
+
 }
 
 </script>
